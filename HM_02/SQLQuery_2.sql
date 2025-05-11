@@ -1,48 +1,75 @@
--- Описание всех таблиц
+-- РћРїРёСЃР°РЅРёРµ РІСЃРµС… С‚Р°Р±Р»РёС†
 -- https://learn.microsoft.com/en-us/sql/samples/wide-world-importers-oltp-database-catalog?view=sql-server-ver16#tables
 
---1. Все товары, в названии которых есть "urgent" или название начинается с "Animal"
+--1. Р’СЃРµ С‚РѕРІР°СЂС‹, РІ РЅР°Р·РІР°РЅРёРё РєРѕС‚РѕСЂС‹С… РµСЃС‚СЊ "urgent" РёР»Рё РЅР°Р·РІР°РЅРёРµ РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ "Animal"
 SELECT * 
 FROM Warehouse.StockItems
 WHERE StockItemName like '%urgent%'
 or StockItemName like 'Animal%';
 
---2.Поставщиков (Suppliers), у которых не было сделано ни одного заказа (PurchaseOrders).
+--2.РџРѕСЃС‚Р°РІС‰РёРєРѕРІ (Suppliers), Сѓ РєРѕС‚РѕСЂС‹С… РЅРµ Р±С‹Р»Рѕ СЃРґРµР»Р°РЅРѕ РЅРё РѕРґРЅРѕРіРѕ Р·Р°РєР°Р·Р° (PurchaseOrders).
 SELECT *
 FROM Purchasing.Suppliers sup
 LEFT JOIN Purchasing.PurchaseOrders orders on sup.SupplierID = orders.SupplierID
 WHERE orders.PurchaseOrderID is null;
 
---3.Заказы (Orders) с ценой товара (UnitPrice) более 100$ либо количеством единиц (Quantity) товара более 20 штуки 
---присутствующей датой комплектации всего заказа (PickingCompletedWhen).
-SELECT Orders.OrderID, cast( orlines.PickingCompletedWhen as date) as PickingCompletedWhen 
-FROM Sales.Orders
-LEFT JOIN Sales.OrderLines orlines on Orders.OrderID = orlines.OrderID
-WHERE orlines.UnitPrice > 100
-or orlines.Quantity > 20
-and Orders.PickingCompletedWhen is not null
-and orlines.PickingCompletedWhen is not null
-GROUP BY Orders.OrderID, cast( orlines.PickingCompletedWhen as date) 
-order by OrderID;
+--3. Р—Р°РєР°Р·С‹ (Orders) СЃ С†РµРЅРѕР№ С‚РѕРІР°СЂР° (UnitPrice) Р±РѕР»РµРµ 100$ 
+--Р»РёР±Рѕ РєРѕР»РёС‡РµСЃС‚РІРѕРј РµРґРёРЅРёС† (Quantity) С‚РѕРІР°СЂР° Р±РѕР»РµРµ 20 С€С‚СѓРє
+--Рё РїСЂРёСЃСѓС‚СЃС‚РІСѓСЋС‰РµР№ РґР°С‚РѕР№ РєРѕРјРїР»РµРєС‚Р°С†РёРё РІСЃРµРіРѕ Р·Р°РєР°Р·Р° (PickingCompletedWhen).
+--Р’С‹РІРµСЃС‚Рё:
+--* OrderID
+--* РґР°С‚Сѓ Р·Р°РєР°Р·Р° (OrderDate) РІ С„РѕСЂРјР°С‚Рµ Р”Р”.РњРњ.Р“Р“Р“Р“
+--* РЅР°Р·РІР°РЅРёРµ РјРµСЃСЏС†Р°, РІ РєРѕС‚РѕСЂРѕРј Р±С‹Р» СЃРґРµР»Р°РЅ Р·Р°РєР°Р·
+--* РЅРѕРјРµСЂ РєРІР°СЂС‚Р°Р»Р°, РІ РєРѕС‚РѕСЂРѕРј Р±С‹Р» СЃРґРµР»Р°РЅ Р·Р°РєР°Р·
+--* С‚СЂРµС‚СЊ РіРѕРґР°, Рє РєРѕС‚РѕСЂРѕР№ РѕС‚РЅРѕСЃРёС‚СЃСЏ РґР°С‚Р° Р·Р°РєР°Р·Р° (РєР°Р¶РґР°СЏ С‚СЂРµС‚СЊ РїРѕ 4 РјРµСЃСЏС†Р°)
+--* РёРјСЏ Р·Р°РєР°Р·С‡РёРєР° (Customer)
+--Р”РѕР±Р°РІСЊС‚Рµ РІР°СЂРёР°РЅС‚ СЌС‚РѕРіРѕ Р·Р°РїСЂРѕСЃР° СЃ РїРѕСЃС‚СЂР°РЅРёС‡РЅРѕР№ РІС‹Р±РѕСЂРєРѕР№,
+--РїСЂРѕРїСѓСЃС‚РёРІ РїРµСЂРІСѓСЋ 1000 Рё РѕС‚РѕР±СЂР°Р·РёРІ СЃР»РµРґСѓСЋС‰РёРµ 100 Р·Р°РїРёСЃРµР№.
+
+--РЎРѕСЂС‚РёСЂРѕРІРєР° РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РїРѕ РЅРѕРјРµСЂСѓ РєРІР°СЂС‚Р°Р»Р°, С‚СЂРµС‚Рё РіРѕРґР°, РґР°С‚Рµ Р·Р°РєР°Р·Р° (РІРµР·РґРµ РїРѕ РІРѕР·СЂР°СЃС‚Р°РЅРёСЋ).
 
 --3.1
-SELECT DISTINCT Orders.OrderID, cast( Orders.PickingCompletedWhen as date) as PickingCompletedWhen 
+SELECT DISTINCT Orders.OrderID, 
+CONVERT(VARCHAR(10), Orders.PickingCompletedWhen, 104) as Р”Р°С‚Р°,
+datename(month, Orders.PickingCompletedWhen) as "РњРµСЃСЏС† ", 
+DATEADD(quarter, DATEDIFF(quarter, 0, Orders.PickingCompletedWhen), 0) AS StartOfQuarter,
+CASE 
+        WHEN DATEPART(month, Orders.PickingCompletedWhen) BETWEEN 1 AND 3 THEN 1
+        WHEN DATEPART(month, Orders.PickingCompletedWhen) BETWEEN 4 AND 6 THEN 2
+        WHEN DATEPART(month, Orders.PickingCompletedWhen) BETWEEN 7 AND 9 THEN 3
+        ELSE 4
+    END AS YearThird,
+Orders.CustomerId
 FROM Sales.Orders
 LEFT JOIN Sales.OrderLines orlines on Orders.OrderID = orlines.OrderID and cast( orlines.PickingCompletedWhen as date) = cast( Orders.PickingCompletedWhen as date)
 WHERE orlines.UnitPrice > 100
 or orlines.Quantity > 20
-order by OrderID;
+order by StartOfQuarter, YearThird, Р”Р°С‚Р°;
 
--- 3.2 без учета значения null в дате заказе
-SELECT DISTINCT Orders.OrderID, cast( orlines.PickingCompletedWhen as date) as PickingCompletedWhen 
+-- 3.2 Р”РѕР±Р°РІСЊС‚Рµ РІР°СЂРёР°РЅС‚ СЌС‚РѕРіРѕ Р·Р°РїСЂРѕСЃР° СЃ РїРѕСЃС‚СЂР°РЅРёС‡РЅРѕР№ РІС‹Р±РѕСЂРєРѕР№,
+--РїСЂРѕРїСѓСЃС‚РёРІ РїРµСЂРІСѓСЋ 1000 Рё РѕС‚РѕР±СЂР°Р·РёРІ СЃР»РµРґСѓСЋС‰РёРµ 100 Р·Р°РїРёСЃРµР№.
+DECLARE @pagesize BIGINT = 100, -- Р Р°Р·РјРµСЂ СЃС‚СЂР°РЅРёС†С‹
+	@pagenum BIGINT = 10;-- РќРѕРјРµСЂ СЃС‚СЂР°РЅРёС†С‹
+SELECT DISTINCT Orders.OrderID, 
+CONVERT(VARCHAR(10), Orders.PickingCompletedWhen, 104) as Р”Р°С‚Р°,
+datename(month, Orders.PickingCompletedWhen) as "РњРµСЃСЏС† ", 
+DATEADD(quarter, DATEDIFF(quarter, 0, Orders.PickingCompletedWhen), 0) AS StartOfQuarter,
+CASE 
+        WHEN DATEPART(month, Orders.PickingCompletedWhen) BETWEEN 1 AND 3 THEN 1
+        WHEN DATEPART(month, Orders.PickingCompletedWhen) BETWEEN 4 AND 6 THEN 2
+        WHEN DATEPART(month, Orders.PickingCompletedWhen) BETWEEN 7 AND 9 THEN 3
+        ELSE 4
+    END AS YearThird,
+Orders.CustomerId
 FROM Sales.Orders
-LEFT JOIN Sales.OrderLines orlines on Orders.OrderID = orlines.OrderID
+LEFT JOIN Sales.OrderLines orlines on Orders.OrderID = orlines.OrderID and cast( orlines.PickingCompletedWhen as date) = cast( Orders.PickingCompletedWhen as date)
 WHERE orlines.UnitPrice > 100
 or orlines.Quantity > 20
-order by OrderID;
+order by StartOfQuarter, YearThird, Р”Р°С‚Р° DESC OFFSET(@pagenum - 1) * @pagesize ROWS 
+FETCH NEXT @pagesize ROWS ONLY;
 
---4. Заказы поставщикам (Purchasing.Suppliers), которые должны быть исполнены (ExpectedDeliveryDate) в январе 2013 года 
---с доставкой "Air Freight" или "Refrigerated Air Freight" (DeliveryMethodName) и которые исполнены (IsOrderFinalized).
+--4. Р—Р°РєР°Р·С‹ РїРѕСЃС‚Р°РІС‰РёРєР°Рј (Purchasing.Suppliers), РєРѕС‚РѕСЂС‹Рµ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РёСЃРїРѕР»РЅРµРЅС‹ (ExpectedDeliveryDate) РІ СЏРЅРІР°СЂРµ 2013 РіРѕРґР° 
+--СЃ РґРѕСЃС‚Р°РІРєРѕР№ "Air Freight" РёР»Рё "Refrigerated Air Freight" (DeliveryMethodName) Рё РєРѕС‚РѕСЂС‹Рµ РёСЃРїРѕР»РЅРµРЅС‹ (IsOrderFinalized).
 SELECT *
 FROM Purchasing.PurchaseOrders
 LEFT JOIN Application.DeliveryMethods on PurchaseOrders.DeliveryMethodID = DeliveryMethods.DeliveryMethodID
@@ -51,14 +78,14 @@ and DeliveryMethods.DeliveryMethodName IN ('Air Freight', 'Refrigerated Air Frei
 AND IsOrderFinalized = 1
 ORDER by ExpectedDeliveryDate;
 
---5. Десять последних продаж (по дате продажи) с именем клиента и именем сотрудника, который оформил заказ (SalespersonPerson). Сделать без подзапросов.
+--5. Р”РµСЃСЏС‚СЊ РїРѕСЃР»РµРґРЅРёС… РїСЂРѕРґР°Р¶ (РїРѕ РґР°С‚Рµ РїСЂРѕРґР°Р¶Рё) СЃ РёРјРµРЅРµРј РєР»РёРµРЅС‚Р° Рё РёРјРµРЅРµРј СЃРѕС‚СЂСѓРґРЅРёРєР°, РєРѕС‚РѕСЂС‹Р№ РѕС„РѕСЂРјРёР» Р·Р°РєР°Р· (SalespersonPerson). РЎРґРµР»Р°С‚СЊ Р±РµР· РїРѕРґР·Р°РїСЂРѕСЃРѕРІ.
 SELECT top (10) Orders.OrderID, Customers.CustomerID, Customers.CustomerName, Application.People.PersonID, Application.People.FullName, OrderDate
 FROM Sales.Orders
 JOIN Sales.Customers on Orders.CustomerID = Customers.CustomerID
 JOIN Application.People on Orders.SalespersonPersonID = People.PersonID
 ORDER BY OrderDate desc
 
---5.1 Десять последних продаж для каждого клиента
+--5.1 Р”РµСЃСЏС‚СЊ РїРѕСЃР»РµРґРЅРёС… РїСЂРѕРґР°Р¶ РґР»СЏ РєР°Р¶РґРѕРіРѕ РєР»РёРµРЅС‚Р°
 WITH RankedSales AS (
     SELECT 
         Orders.OrderID,
@@ -86,7 +113,7 @@ ORDER BY
     OrderDate DESC;
 
 
---6. Все ид и имена клиентов и их контактные телефоны, которые покупали товар "Chocolate frogs 250g"
+--6. Р’СЃРµ РёРґ Рё РёРјРµРЅР° РєР»РёРµРЅС‚РѕРІ Рё РёС… РєРѕРЅС‚Р°РєС‚РЅС‹Рµ С‚РµР»РµС„РѕРЅС‹, РєРѕС‚РѕСЂС‹Рµ РїРѕРєСѓРїР°Р»Рё С‚РѕРІР°СЂ "Chocolate frogs 250g"
 SELECT Customers.CustomerID, Customers.CustomerName, Customers.PhoneNumber
 FROM Sales.OrderLines
 JOIN Warehouse.StockItems on OrderLines.StockItemID = StockItems.StockItemID
