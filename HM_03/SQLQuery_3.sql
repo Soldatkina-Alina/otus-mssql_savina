@@ -1,42 +1,42 @@
 /*
-Домашнее задание по курсу MS SQL Server Developer в OTUS.
-Занятие "02 - Оператор SELECT и простые фильтры, GROUP BY, HAVING".
+Р”РѕРјР°С€РЅРµРµ Р·Р°РґР°РЅРёРµ РїРѕ РєСѓСЂСЃСѓ MS SQL Server Developer РІ OTUS.
+Р—Р°РЅСЏС‚РёРµ "02 - РћРїРµСЂР°С‚РѕСЂ SELECT Рё РїСЂРѕСЃС‚С‹Рµ С„РёР»СЊС‚СЂС‹, GROUP BY, HAVING".
 
-Задания выполняются с использованием базы данных WideWorldImporters.
+Р—Р°РґР°РЅРёСЏ РІС‹РїРѕР»РЅСЏСЋС‚СЃСЏ СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј Р±Р°Р·С‹ РґР°РЅРЅС‹С… WideWorldImporters.
 
-Бэкап БД можно скачать отсюда:
+Р‘СЌРєР°Рї Р‘Р” РјРѕР¶РЅРѕ СЃРєР°С‡Р°С‚СЊ РѕС‚СЃСЋРґР°:
 https://github.com/Microsoft/sql-server-samples/releases/tag/wide-world-importers-v1.0
-Нужен WideWorldImporters-Full.bak
+РќСѓР¶РµРЅ WideWorldImporters-Full.bak
 
-Описание WideWorldImporters от Microsoft:
+РћРїРёСЃР°РЅРёРµ WideWorldImporters РѕС‚ Microsoft:
 * https://docs.microsoft.com/ru-ru/sql/samples/wide-world-importers-what-is
 * https://docs.microsoft.com/ru-ru/sql/samples/wide-world-importers-oltp-database-catalog
 */
 
 -- ---------------------------------------------------------------------------
--- Задание - написать выборки для получения указанных ниже данных.
+-- Р—Р°РґР°РЅРёРµ - РЅР°РїРёСЃР°С‚СЊ РІС‹Р±РѕСЂРєРё РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ СѓРєР°Р·Р°РЅРЅС‹С… РЅРёР¶Рµ РґР°РЅРЅС‹С….
 -- ---------------------------------------------------------------------------
 
 USE WideWorldImporters
 
 /*
-1. Посчитать среднюю цену товара, общую сумму продажи по месяцам.
-Вывести:
-* Год продажи (например, 2015)
-* Месяц продажи (например, 4)
-* Средняя цена за месяц по всем товарам
-* Общая сумма продаж за месяц
+1. РџРѕСЃС‡РёС‚Р°С‚СЊ СЃСЂРµРґРЅСЋСЋ С†РµРЅСѓ С‚РѕРІР°СЂР°, РѕР±С‰СѓСЋ СЃСѓРјРјСѓ РїСЂРѕРґР°Р¶Рё РїРѕ РјРµСЃСЏС†Р°Рј.
+Р’С‹РІРµСЃС‚Рё:
+* Р“РѕРґ РїСЂРѕРґР°Р¶Рё (РЅР°РїСЂРёРјРµСЂ, 2015)
+* РњРµСЃСЏС† РїСЂРѕРґР°Р¶Рё (РЅР°РїСЂРёРјРµСЂ, 4)
+* РЎСЂРµРґРЅСЏСЏ С†РµРЅР° Р·Р° РјРµСЃСЏС† РїРѕ РІСЃРµРј С‚РѕРІР°СЂР°Рј
+* РћР±С‰Р°СЏ СЃСѓРјРјР° РїСЂРѕРґР°Р¶ Р·Р° РјРµСЃСЏС†
 
-Продажи смотреть в таблице Sales.Invoices и связанных таблицах.
+РџСЂРѕРґР°Р¶Рё СЃРјРѕС‚СЂРµС‚СЊ РІ С‚Р°Р±Р»РёС†Рµ Sales.Invoices Рё СЃРІСЏР·Р°РЅРЅС‹С… С‚Р°Р±Р»РёС†Р°С….
 */
 
-SELECT DATENAME(year, Orders.OrderDate) as Год, DATENAME(month, Orders.OrderDate) as Месяц, AVG(UnitPrice) as AvgUnitPrice, SUM(UnitPrice) as SumUnitPrice
+SELECT DATENAME(year, Orders.OrderDate) as Р“РѕРґ, DATENAME(month, Orders.OrderDate) as РњРµСЃСЏС†, AVG(UnitPrice) as AvgUnitPrice, SUM(UnitPrice) as SumUnitPrice
 FROM Sales.OrderLines
 LEFT JOIN Sales.Orders on Orders.OrderID = OrderLines.OrderID
 GROUP BY year(Orders.OrderDate), DATENAME(year, Orders.OrderDate),month(Orders.OrderDate), DATENAME(month, Orders.OrderDate)
 ORDER BY year(Orders.OrderDate), month(Orders.OrderDate) asc;
 
---+сумма по годам
+--+СЃСѓРјРјР° РїРѕ РіРѕРґР°Рј
 SELECT 
 year(Orders.OrderDate),
 month(Orders.OrderDate), 
@@ -51,53 +51,60 @@ ORDER BY year(Orders.OrderDate), month(Orders.OrderDate) asc;
 
 
 /*
-2. Отобразить все месяцы, где общая сумма продаж превысила 4 600 000
+2. РћС‚РѕР±СЂР°Р·РёС‚СЊ РІСЃРµ РјРµСЃСЏС†С‹, РіРґРµ РѕР±С‰Р°СЏ СЃСѓРјРјР° РїСЂРѕРґР°Р¶ РїСЂРµРІС‹СЃРёР»Р° 4 600 000
 
-Вывести:
-* Год продажи (например, 2015)
-* Месяц продажи (например, 4)
-* Общая сумма продаж
+Р’С‹РІРµСЃС‚Рё:
+* Р“РѕРґ РїСЂРѕРґР°Р¶Рё (РЅР°РїСЂРёРјРµСЂ, 2015)
+* РњРµСЃСЏС† РїСЂРѕРґР°Р¶Рё (РЅР°РїСЂРёРјРµСЂ, 4)
+* РћР±С‰Р°СЏ СЃСѓРјРјР° РїСЂРѕРґР°Р¶
 
-Продажи смотреть в таблице Sales.Invoices и связанных таблицах.
+РџСЂРѕРґР°Р¶Рё СЃРјРѕС‚СЂРµС‚СЊ РІ С‚Р°Р±Р»РёС†Рµ Sales.Invoices Рё СЃРІСЏР·Р°РЅРЅС‹С… С‚Р°Р±Р»РёС†Р°С….
 */
 
-SELECT year(Orders.PickingCompletedWhen), month(Orders.PickingCompletedWhen), AVG(UnitPrice) as AvgUnitPrice, SUM(UnitPrice) as SumUnitPrice
+SELECT year(Orders.OrderDate), month(Orders.OrderDate), AVG(InvoiceLines.UnitPrice) as AvgUnitPrice, SUM(OrderLines.Quantity* InvoiceLines.UnitPrice) as SumUnitPrice
 FROM Sales.OrderLines
 LEFT JOIN Sales.Orders on Orders.OrderID = OrderLines.OrderID
-GROUP BY Rollup( year(Orders.PickingCompletedWhen),
-month(Orders.PickingCompletedWhen))
-HAVING SUM(UnitPrice) > 46000
-ORDER BY year(Orders.PickingCompletedWhen), month(Orders.PickingCompletedWhen) asc;
+LEFT JOIN Sales.Invoices on Invoices.OrderID = Orders.OrderID
+LEFT JOIN Sales.InvoiceLines on InvoiceLines.InvoiceID = Invoices.InvoiceID
+GROUP BY Rollup( year(Orders.OrderDate),
+month(Orders.OrderDate))
+HAVING SUM(OrderLines.Quantity * InvoiceLines.UnitPrice) > 4600000
+ORDER BY year(Orders.OrderDate), month(Orders.OrderDate) asc;
 /*
-3. Вывести сумму продаж, дату первой продажи
-и количество проданного по месяцам, по товарам,
-продажи которых менее 50 ед в месяц.
-Группировка должна быть по году,  месяцу, товару.
+3. Р’С‹РІРµСЃС‚Рё СЃСѓРјРјСѓ РїСЂРѕРґР°Р¶, РґР°С‚Сѓ РїРµСЂРІРѕР№ РїСЂРѕРґР°Р¶Рё
+Рё РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРґР°РЅРЅРѕРіРѕ РїРѕ РјРµСЃСЏС†Р°Рј, РїРѕ С‚РѕРІР°СЂР°Рј,
+РїСЂРѕРґР°Р¶Рё РєРѕС‚РѕСЂС‹С… РјРµРЅРµРµ 50 РµРґ РІ РјРµСЃСЏС†.
+Р“СЂСѓРїРїРёСЂРѕРІРєР° РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РїРѕ РіРѕРґСѓ,  РјРµСЃСЏС†Сѓ, С‚РѕРІР°СЂСѓ.
 
-Вывести:
-* Год продажи
-* Месяц продажи
-* Наименование товара
-* Сумма продаж
-* Дата первой продажи
-* Количество проданного
+Р’С‹РІРµСЃС‚Рё:
+* Р“РѕРґ РїСЂРѕРґР°Р¶Рё
+* РњРµСЃСЏС† РїСЂРѕРґР°Р¶Рё
+* РќР°РёРјРµРЅРѕРІР°РЅРёРµ С‚РѕРІР°СЂР°
+* РЎСѓРјРјР° РїСЂРѕРґР°Р¶
+* Р”Р°С‚Р° РїРµСЂРІРѕР№ РїСЂРѕРґР°Р¶Рё
+* РљРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРѕРґР°РЅРЅРѕРіРѕ
 
-Продажи смотреть в таблице Sales.Invoices и связанных таблицах.
+РџСЂРѕРґР°Р¶Рё СЃРјРѕС‚СЂРµС‚СЊ РІ С‚Р°Р±Р»РёС†Рµ Sales.Invoices Рё СЃРІСЏР·Р°РЅРЅС‹С… С‚Р°Р±Р»РёС†Р°С….
 */
-SELECT year(Orders.OrderDate) Год,
-month(Orders.OrderDate) Месяц, StockItemName, SUM(OrderLines.UnitPrice) as AvgUnitPrice ,  MIN (Orders.OrderDate) Первая_продажа, SUM(Quantity) as Quantity
+SELECT year(Orders.OrderDate) Р“РѕРґ,
+month(Orders.OrderDate) РњРµСЃСЏС†, StockItemName, 
+SUM(OrderLines.Quantity * InvoiceLines.UnitPrice) as РЎСѓРјРјР°, 
+MIN (Orders.OrderDate) РџРµСЂРІР°СЏ_РїСЂРѕРґР°Р¶Р°, 
+SUM(OrderLines.Quantity) as РљРѕР»РёС‡РµСЃС‚РІРѕ
 FROM Sales.OrderLines
 LEFT JOIN Sales.Orders on Orders.OrderID = OrderLines.OrderID
 LEFT JOIN Warehouse.StockItems on StockItems.StockItemID = OrderLines.StockItemID
+LEFT JOIN Sales.Invoices on Invoices.OrderID = Orders.OrderID
+LEFT JOIN Sales.InvoiceLines on InvoiceLines.InvoiceID = Invoices.InvoiceID
 GROUP BY  Rollup(year(Orders.OrderDate),
 month(Orders.OrderDate), StockItemName)
-HAVING SUM(Quantity) > 50
-ORDER BY Год, Месяц desc
+HAVING SUM(OrderLines.Quantity * InvoiceLines.UnitPrice) > 50
+ORDER BY Р“РѕРґ, РњРµСЃСЏС† desc
 
 -- ---------------------------------------------------------------------------
--- Опционально
+-- РћРїС†РёРѕРЅР°Р»СЊРЅРѕ
 -- ---------------------------------------------------------------------------
 /*
-Написать запросы 2-3 так, чтобы если в каком-то месяце не было продаж,
-то этот месяц также отображался бы в результатах, но там были нули.
+РќР°РїРёСЃР°С‚СЊ Р·Р°РїСЂРѕСЃС‹ 2-3 С‚Р°Рє, С‡С‚РѕР±С‹ РµСЃР»Рё РІ РєР°РєРѕРј-С‚Рѕ РјРµСЃСЏС†Рµ РЅРµ Р±С‹Р»Рѕ РїСЂРѕРґР°Р¶,
+С‚Рѕ СЌС‚РѕС‚ РјРµСЃСЏС† С‚Р°РєР¶Рµ РѕС‚РѕР±СЂР°Р¶Р°Р»СЃСЏ Р±С‹ РІ СЂРµР·СѓР»СЊС‚Р°С‚Р°С…, РЅРѕ С‚Р°Рј Р±С‹Р»Рё РЅСѓР»Рё.
 */
