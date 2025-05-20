@@ -115,7 +115,7 @@ LEFT JOIN Sales.InvoiceLines on InvoiceLines.InvoiceID = Invoices.InvoiceID
 LEFT JOIN Warehouse.StockItems on InvoiceLines.StockItemID = StockItems.StockItemID
 GROUP BY  Rollup(year(Invoices.InvoiceDate),
 month(Invoices.InvoiceDate), StockItemName)
-HAVING SUM(InvoiceLines.Quantity) > 50
+HAVING SUM(InvoiceLines.Quantity) < 50
 ORDER BY Год, Месяц desc
 
 -- ---------------------------------------------------------------------------
