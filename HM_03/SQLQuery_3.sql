@@ -70,6 +70,24 @@ GROUP BY Rollup( year(Orders.OrderDate),
 month(Orders.OrderDate))
 HAVING SUM(OrderLines.Quantity * InvoiceLines.UnitPrice) > 4600000
 ORDER BY year(Orders.OrderDate), month(Orders.OrderDate) asc;
+
+
+-- +Месяца в которых нет продаж
+select mm.value as dmonth, yy.value as dyear, ISNULL( AvgUnitPrice, 0) AvgUnitPrice, ISNULL( SumUnitPrice, 0) SumUnitPrice
+from string_split('1 2 3 4 5 6 7 8 9 10 11 12', ' ') as mm
+cross join string_split('2013 2014 2015 2016', ' ') as yy
+LEFT JOIN (
+SELECT year(Orders.OrderDate) tyear, month(Orders.OrderDate) tmonth, AVG(InvoiceLines.UnitPrice) as AvgUnitPrice, 
+SUM(OrderLines.Quantity* InvoiceLines.UnitPrice) as SumUnitPrice
+FROM Sales.OrderLines
+LEFT JOIN Sales.Orders on Orders.OrderID = OrderLines.OrderID
+LEFT JOIN Sales.Invoices on Invoices.OrderID = Orders.OrderID
+LEFT JOIN Sales.InvoiceLines on InvoiceLines.InvoiceID = Invoices.InvoiceID
+GROUP BY Rollup( year(Orders.OrderDate),
+month(Orders.OrderDate))
+HAVING SUM(OrderLines.Quantity * InvoiceLines.UnitPrice) > 8000000
+) as t1 on t1.tyear = yy.value and t1.tmonth = mm.value
+ORDER BY dyear, dmonth, t1.tyear, t1.tmonth asc
 /*
 3. Вывести сумму продаж, дату первой продажи
 и количество проданного по месяцам, по товарам,
@@ -86,19 +104,18 @@ ORDER BY year(Orders.OrderDate), month(Orders.OrderDate) asc;
 
 Продажи смотреть в таблице Sales.Invoices и связанных таблицах.
 */
-SELECT year(Orders.OrderDate) Год,
-month(Orders.OrderDate) Месяц, StockItemName, 
-SUM(OrderLines.Quantity * InvoiceLines.UnitPrice) as Сумма, 
-MIN (Orders.OrderDate) Первая_продажа, 
-SUM(OrderLines.Quantity) as Количество
-FROM Sales.OrderLines
-LEFT JOIN Sales.Orders on Orders.OrderID = OrderLines.OrderID
-LEFT JOIN Warehouse.StockItems on StockItems.StockItemID = OrderLines.StockItemID
-LEFT JOIN Sales.Invoices on Invoices.OrderID = Orders.OrderID
+SELECT year(Invoices.InvoiceDate) Год,
+month(Invoices.InvoiceDate) Месяц, StockItemName, 
+SUM(InvoiceLines.Quantity * InvoiceLines.UnitPrice) as Сумма, 
+MIN (Invoices.InvoiceDate) Первая_продажа, 
+SUM(InvoiceLines.Quantity) as Количество
+FROM 
+Sales.Invoices  
 LEFT JOIN Sales.InvoiceLines on InvoiceLines.InvoiceID = Invoices.InvoiceID
-GROUP BY  Rollup(year(Orders.OrderDate),
-month(Orders.OrderDate), StockItemName)
-HAVING SUM(OrderLines.Quantity * InvoiceLines.UnitPrice) > 50
+LEFT JOIN Warehouse.StockItems on InvoiceLines.StockItemID = StockItems.StockItemID
+GROUP BY  Rollup(year(Invoices.InvoiceDate),
+month(Invoices.InvoiceDate), StockItemName)
+HAVING SUM(InvoiceLines.Quantity) > 50
 ORDER BY Год, Месяц desc
 
 -- ---------------------------------------------------------------------------
