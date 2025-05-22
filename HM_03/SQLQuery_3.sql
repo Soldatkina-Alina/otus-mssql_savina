@@ -116,7 +116,35 @@ LEFT JOIN Warehouse.StockItems on InvoiceLines.StockItemID = StockItems.StockIte
 GROUP BY  Rollup(year(Invoices.InvoiceDate),
 month(Invoices.InvoiceDate), StockItemName)
 HAVING SUM(InvoiceLines.Quantity) < 50
-ORDER BY Год, Месяц desc
+ORDER BY Год, Месяц desc;
+
+
+WITH DateRange AS (
+SELECT DISTINCT
+years.Year AS [Год продажи],
+months.month AS [Месяц продажи]
+FROM Sales.Invoices i WITH (NOLOCK)
+CROSS JOIN (SELECT DISTINCT YEAR(InvoiceDate) AS Year FROM Sales.Invoices) years
+CROSS JOIN (SELECT 1 AS month UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6
+UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) months)
+SELECT
+dr.[Год продажи],
+dr.[Месяц продажи],
+si.StockItemName AS [Наименование товара],
+COALESCE(SUM(il.Quantity * il.UnitPrice), 0) AS [Сумма продаж],
+MIN(i.InvoiceDate) AS [Дата первой продажи],
+COALESCE(SUM(il.Quantity), 0) AS [Количество проданного]
+FROM DateRange dr
+LEFT JOIN Sales.Invoices i WITH (NOLOCK)
+ON YEAR(i.InvoiceDate) = dr.[Год продажи]
+AND MONTH(i.InvoiceDate) = dr.[Месяц продажи]
+LEFT JOIN Sales.InvoiceLines il WITH (NOLOCK)
+ON il.InvoiceID = i.InvoiceID
+LEFT JOIN Warehouse.StockItems si WITH (NOLOCK)
+ON il.StockItemID = si.StockItemID
+GROUP BY dr.[Год продажи], dr.[Месяц продажи], si.StockItemName
+HAVING COALESCE(SUM(il.Quantity), 0) < 50
+ORDER BY dr.[Год продажи], dr.[Месяц продажи], si.StockItemName;
 
 -- ---------------------------------------------------------------------------
 -- Опционально
