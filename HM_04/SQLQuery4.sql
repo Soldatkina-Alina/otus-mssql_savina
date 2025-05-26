@@ -1,6 +1,6 @@
 USE WideWorldImporters
---1. Выберите сотрудников (Application.People), которые являются продажниками (IsSalesPerson), и не сделали ни одной продажи 04 июля 2015 года. 
---Вывести ИД сотрудника и его полное имя. Продажи смотреть в таблице Sales.Invoices.
+--1. Р’С‹Р±РµСЂРёС‚Рµ СЃРѕС‚СЂСѓРґРЅРёРєРѕРІ (Application.People), РєРѕС‚РѕСЂС‹Рµ СЏРІР»СЏСЋС‚СЃСЏ РїСЂРѕРґР°Р¶РЅРёРєР°РјРё (IsSalesPerson), Рё РЅРµ СЃРґРµР»Р°Р»Рё РЅРё РѕРґРЅРѕР№ РїСЂРѕРґР°Р¶Рё 04 РёСЋР»СЏ 2015 РіРѕРґР°. 
+--Р’С‹РІРµСЃС‚Рё РР” СЃРѕС‚СЂСѓРґРЅРёРєР° Рё РµРіРѕ РїРѕР»РЅРѕРµ РёРјСЏ. РџСЂРѕРґР°Р¶Рё СЃРјРѕС‚СЂРµС‚СЊ РІ С‚Р°Р±Р»РёС†Рµ Sales.Invoices.
 
 select People.PersonID, FullName, inv.SalespersonPersonID 
 from Application.People
@@ -12,8 +12,8 @@ where inv.SalespersonPersonID is null
 and IsSalesperson = 1;
 
 
---2. Выберите товары с минимальной ценой (подзапросом). Сделайте два варианта подзапроса. 
---Вывести: ИД товара, наименование товара, цена.
+--2. Р’С‹Р±РµСЂРёС‚Рµ С‚РѕРІР°СЂС‹ СЃ РјРёРЅРёРјР°Р»СЊРЅРѕР№ С†РµРЅРѕР№ (РїРѕРґР·Р°РїСЂРѕСЃРѕРј). РЎРґРµР»Р°Р№С‚Рµ РґРІР° РІР°СЂРёР°РЅС‚Р° РїРѕРґР·Р°РїСЂРѕСЃР°. 
+--Р’С‹РІРµСЃС‚Рё: РР” С‚РѕРІР°СЂР°, РЅР°РёРјРµРЅРѕРІР°РЅРёРµ С‚РѕРІР°СЂР°, С†РµРЅР°.
 ;
 select InvoiceLines.StockItemID, StockItemName, InvoiceLines.UnitPrice from Sales.InvoiceLines
 Left join Warehouse.StockItems on InvoiceLines.StockItemID = StockItems.StockItemID
@@ -28,8 +28,8 @@ Left join Warehouse.StockItems on InvoiceLines.StockItemID = StockItems.StockIte
 JOIN MinPrice on MinPrice.price = InvoiceLines.UnitPrice
 group by InvoiceLines.StockItemID, StockItemName,InvoiceLines.UnitPrice;
 
---3. Выберите информацию по клиентам, которые перевели компании пять максимальных платежей из Sales.CustomerTransactions. 
---Представьте несколько способов (в том числе с CTE).
+--3. Р’С‹Р±РµСЂРёС‚Рµ РёРЅС„РѕСЂРјР°С†РёСЋ РїРѕ РєР»РёРµРЅС‚Р°Рј, РєРѕС‚РѕСЂС‹Рµ РїРµСЂРµРІРµР»Рё РєРѕРјРїР°РЅРёРё РїСЏС‚СЊ РјР°РєСЃРёРјР°Р»СЊРЅС‹С… РїР»Р°С‚РµР¶РµР№ РёР· Sales.CustomerTransactions. 
+--РџСЂРµРґСЃС‚Р°РІСЊС‚Рµ РЅРµСЃРєРѕР»СЊРєРѕ СЃРїРѕСЃРѕР±РѕРІ (РІ С‚РѕРј С‡РёСЃР»Рµ СЃ CTE).
 
 select top(5) with ties CustomerTransactions.CustomerID, Customers.CustomerName, TransactionAmount 
 from Sales.CustomerTransactions
@@ -44,8 +44,8 @@ order by TransactionAmount desc
 select * from Sales.Customers
 JOIN MaxTrans on MaxTrans.CustomerID = Customers.CustomerID
 
---4. Выберите города (ид и название), в которые были доставлены товары, входящие в тройку самых дорогих товаров, 
---а также имя сотрудника, который осуществлял упаковку заказов (PackedByPersonID).
+--4. Р’С‹Р±РµСЂРёС‚Рµ РіРѕСЂРѕРґР° (РёРґ Рё РЅР°Р·РІР°РЅРёРµ), РІ РєРѕС‚РѕСЂС‹Рµ Р±С‹Р»Рё РґРѕСЃС‚Р°РІР»РµРЅС‹ С‚РѕРІР°СЂС‹, РІС…РѕРґСЏС‰РёРµ РІ С‚СЂРѕР№РєСѓ СЃР°РјС‹С… РґРѕСЂРѕРіРёС… С‚РѕРІР°СЂРѕРІ, 
+--Р° С‚Р°РєР¶Рµ РёРјСЏ СЃРѕС‚СЂСѓРґРЅРёРєР°, РєРѕС‚РѕСЂС‹Р№ РѕСЃСѓС‰РµСЃС‚РІР»СЏР» СѓРїР°РєРѕРІРєСѓ Р·Р°РєР°Р·РѕРІ (PackedByPersonID).
 
 ;with MaxPriceStock  AS (select top(3) with ties InvoiceLines.StockItemID
 from Sales.InvoiceLines

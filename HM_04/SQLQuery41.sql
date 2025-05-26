@@ -1,4 +1,4 @@
---начальный запрос
+--РЅР°С‡Р°Р»СЊРЅС‹Р№ Р·Р°РїСЂРѕСЃ
 SELECT
 Invoices.InvoiceDate,
 Invoices.InvoiceID,
@@ -28,7 +28,7 @@ ORDER BY TotalSumm DESC;
 
 
 SELECT
---упрощенный визуально
+--СѓРїСЂРѕС‰РµРЅРЅС‹Р№ РІРёР·СѓР°Р»СЊРЅРѕ
 Invoices.InvoiceID,
 Invoices.InvoiceDate,
 People.FullName,
@@ -47,9 +47,9 @@ GROUP BY Invoices.InvoiceId, Invoices.InvoiceDate, People.FullName, TotalSummFor
 HAVING SUM(Quantity * UnitPrice) > 27000;
 --ORDER BY TotalSumm DESC;
 
---Чтобы ускорить запрос, пришлось отказаться от выводы нескольких полей
+--Р§С‚РѕР±С‹ СѓСЃРєРѕСЂРёС‚СЊ Р·Р°РїСЂРѕСЃ, РїСЂРёС€Р»РѕСЃСЊ РѕС‚РєР°Р·Р°С‚СЊСЃСЏ РѕС‚ РІС‹РІРѕРґС‹ РЅРµСЃРєРѕР»СЊРєРёС… РїРѕР»РµР№
 SELECT
---упрощенный по стоимости
+--СѓРїСЂРѕС‰РµРЅРЅС‹Р№ РїРѕ СЃС‚РѕРёРјРѕСЃС‚Рё
 Invoices.InvoiceID,
 SUM(InvoiceLines.Quantity * InvoiceLines.UnitPrice) AS TotalSumm,
 TotalSummForPickedItems.TotalSummForPickedItems
@@ -65,7 +65,7 @@ lEFT JOIN (SELECT Orders.OrderId, SUM(OrderLines.PickedQuantity*OrderLines.UnitP
 GROUP BY Invoices.InvoiceId, TotalSummForPickedItems.TotalSummForPickedItems
 HAVING SUM(Quantity * UnitPrice) > 27000;
 
---упрощенный с CTE
+--СѓРїСЂРѕС‰РµРЅРЅС‹Р№ СЃ CTE
 ;with TotalSummForPickedItems as (SELECT Orders.OrderId, SUM(OrderLines.PickedQuantity*OrderLines.UnitPrice) sum
  FROM Sales.OrderLines
  JOIN Sales.Orders on OrderLines.OrderId  = Orders.OrderID and Orders.PickingCompletedWhen IS NOT NULL  
