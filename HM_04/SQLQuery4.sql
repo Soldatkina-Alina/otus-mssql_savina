@@ -51,9 +51,13 @@ JOIN MaxTrans on MaxTrans.CustomerID = Customers.CustomerID
 from Sales.InvoiceLines
 group by InvoiceLines.StockItemID, UnitPrice
 order by UnitPrice, InvoiceLines.StockItemID desc)
-select People.FullName
+
+select Cities.CityName, People.FullName
 fROM Sales.Invoices
 LEFT JOIN Sales.InvoiceLines on Invoices.InvoiceID = InvoiceLines.InvoiceID
 JOIN MaxPriceStock on InvoiceLines.StockItemID = MaxPriceStock.StockItemID
 lEFT JOIN Application.People on People.PersonID = Invoices.PackedByPersonID
-GROUP BY People.FullName
+LEFT JOIN Sales.Customers on Customers.CustomerID = Invoices.CustomerID
+LEFT JOIN Application.Cities on Cities.CityID = Customers.DeliveryCityID
+
+GROUP BY Cities.CityName, People.FullName
