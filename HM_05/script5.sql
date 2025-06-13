@@ -51,7 +51,8 @@ lEFT JOIN Sales.Invoices as inv on inv.InvoiceID = il2.InvoiceID
 where MONTH( inv.InvoiceDate) <= MONTH( Invoices.InvoiceDate) and inv.InvoiceDate <= Invoices.InvoiceDate) as СуммаНарастающимИтогом
 from Sales.Invoices
 LEFT JOIN Sales.InvoiceLines on Invoices.InvoiceID = InvoiceLines.InvoiceID
-order by  Invoices.InvoiceDate
+where Invoices.InvoiceDate > '2014-12-31'
+order by  Invoices.InvoiceDate;
 
 
 /*
@@ -75,7 +76,8 @@ select
 --where MONTH( inv.InvoiceDate) <= MONTH( Invoices.InvoiceDate) and inv.InvoiceDate <= Invoices.InvoiceDate) as СуммаНарастающимИтогом
 from Sales.Invoices
 LEFT JOIN Sales.InvoiceLines on Invoices.InvoiceID = InvoiceLines.InvoiceID
-order by  Invoices.InvoiceDate
+where Invoices.InvoiceDate > '2014-12-31'
+order by  Invoices.InvoiceDate;
 
 /*
 3. Вывести список 2х самых популярных продуктов (по количеству проданных) 
@@ -127,9 +129,10 @@ StockItemID,
 Предыдущая = LAG(StockItemID) OVER (ORDER BY StockItemName),
 Предыдущая2СтрокиНазад = LAG(StockItemName, 2) OVER (ORDER BY StockItemName),
 Предыдущая2СтрокиНазадNotNull = isnull( LAG(StockItemName, 2) OVER (ORDER BY StockItemName), 'No items'),
-Группа =  DENSE_RANK() OVER (ORDER BY QuantityPerOuter)
+QuantityPerOuter,
+ГруппаQuantityPerOuter =  DENSE_RANK() OVER (ORDER BY QuantityPerOuter)
 from Warehouse.StockItems
-order by StockItemName, Номер asc
+order by StockItemName, Номер asc;
 
 /*
 5. По каждому сотруднику выведите последнего клиента(CustomerId), которому сотрудник(AccountPersonId) что-то продал.
