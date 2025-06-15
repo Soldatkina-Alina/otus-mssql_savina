@@ -52,7 +52,7 @@ where MONTH( inv.InvoiceDate) <= MONTH( Invoices.InvoiceDate) and inv.InvoiceDat
 from Sales.Invoices
 LEFT JOIN Sales.InvoiceLines on Invoices.InvoiceID = InvoiceLines.InvoiceID
 where Invoices.InvoiceDate > '2014-12-31'
-order by  Invoices.InvoiceDate;
+ORDER BY YEAR(Invoices.InvoiceDate), MONTH(Invoices.InvoiceDate);
 
 
 /*
@@ -77,7 +77,7 @@ select
 from Sales.Invoices
 LEFT JOIN Sales.InvoiceLines on Invoices.InvoiceID = InvoiceLines.InvoiceID
 where Invoices.InvoiceDate > '2014-12-31'
-order by  Invoices.InvoiceDate;
+ORDER BY YEAR(Invoices.InvoiceDate), MONTH(Invoices.InvoiceDate);
 
 /*
 3. Вывести список 2х самых популярных продуктов (по количеству проданных) 
@@ -129,8 +129,10 @@ StockItemID,
 Предыдущая = LAG(StockItemID) OVER (ORDER BY StockItemName),
 Предыдущая2СтрокиНазад = LAG(StockItemName, 2) OVER (ORDER BY StockItemName),
 Предыдущая2СтрокиНазадNotNull = isnull( LAG(StockItemName, 2) OVER (ORDER BY StockItemName), 'No items'),
-QuantityPerOuter,
-ГруппаQuantityPerOuter =  DENSE_RANK() OVER (ORDER BY QuantityPerOuter)
+TypicalWeightPerUnit,
+ГруппаTypicalWeightPerUnit =  DENSE_RANK() OVER (ORDER BY TypicalWeightPerUnit),
+РазделениеНа30Групп = NTILE(30) OVER (
+ORDER BY TypicalWeightPerUnit) 
 from Warehouse.StockItems
 order by StockItemName, Номер asc;
 
@@ -139,71 +141,26 @@ order by StockItemName, Номер asc;
    В результатах должны быть ид и фамилия сотрудника, ид и название клиента, дата продажи, сумму сделки.
 */
 
---без общей суммы
-select * from(
+;with cte as(
 		select 
-		Invoices.InvoiceID,
-		InvoiceLines.InvoiceLineID,
-		Invoices.CustomerID, 
 		Customers.CustomerName,
-		Invoices.AccountsPersonID, 
-		People.FullName,
+		Customers.CustomerID,
+		People.PersonID,
+		People.FullName as AccountsPersonName,
 		Invoices.InvoiceDate, 
-		(Quantity * UnitPrice) Summ,
-		max(InvoiceDate) over (partition by AccountsPersonID order by InvoiceDate desc) maxDate
+		SUM(Quantity * UnitPrice) Summ,
+		ROW_NUMBER() OVER (PARTITION BY People.PersonID ORDER BY Invoices.InvoiceDate DESC) AS RowNum
 		from
 		Sales.InvoiceLines 
 		LEFT JOIN Sales.Invoices on Invoices.InvoiceID = InvoiceLines.InvoiceID
-		LEFT JOIN Application.People on PersonID = Invoices.AccountsPersonID
+		LEFT JOIN Application.People  on People.PersonID = Invoices.SalespersonPersonID
 		LEFT JOIN Sales.Customers on Customers.CustomerID = Invoices.CustomerID
-		) as t
-where InvoiceDate = maxDate
-order by InvoiceID;
-
---с общей суммой, последний по дате
-select distinct InvoiceID,CustomerName,FullName, maxDate,
-sum(Summ) over(partition by InvoiceID )
-from(
-		select 
-		Invoices.InvoiceID,
-		InvoiceLines.InvoiceLineID,
-		Invoices.CustomerID, 
-		Customers.CustomerName,
-		Invoices.AccountsPersonID, 
-		People.FullName,
-		Invoices.InvoiceDate, 
-		(Quantity * UnitPrice) Summ,
-		max(InvoiceDate) over (partition by AccountsPersonID order by InvoiceDate desc) maxDate
-		from
-		Sales.InvoiceLines 
-		LEFT JOIN Sales.Invoices on Invoices.InvoiceID = InvoiceLines.InvoiceID
-		LEFT JOIN Application.People on PersonID = Invoices.AccountsPersonID
-		LEFT JOIN Sales.Customers on Customers.CustomerID = Invoices.CustomerID
-		) as t
-where InvoiceDate = maxDate
-order by InvoiceID;
-
--- с общей суммой, последний по Id строки заказа
-select distinct InvoiceID,CustomerID, CustomerName, AccountsPersonID, AccountsPersonName, InvoiceDate,
-sum(Summ) over(partition by InvoiceID ) from(
-		select Invoices.InvoiceID,
-		InvoiceLines.InvoiceLineID
-		,Invoices.CustomerID, 
-		Customers.CustomerName,
-		Invoices.AccountsPersonID, 
-		p1.FullName as AccountsPersonName,
-		Invoices.InvoiceDate, 
-		(Quantity * UnitPrice) Summ,
-		max(Invoices.InvoiceID) over (partition by AccountsPersonID order by InvoiceDate desc) maxInvoicesId
-		from
-		Sales.InvoiceLines 
-		LEFT JOIN Sales.Invoices on Invoices.InvoiceID = InvoiceLines.InvoiceID
-		LEFT JOIN Application.People p1 on p1.PersonID = Invoices.AccountsPersonID
-		LEFT JOIN Sales.Customers on Customers.CustomerID = Invoices.CustomerID
-		) as t
-where InvoiceID = maxInvoicesId
-order by InvoiceID;
-
+		GROUP BY CustomerName, Customers.CustomerID, PersonID, People.FullName, InvoiceDate
+)
+select distinct CustomerID, CustomerName, PersonID, AccountsPersonName, Summ, InvoiceDate
+from cte
+WHERE RowNum = 1
+ORDER BY AccountsPersonName, InvoiceDate DESC;
 /*
 6. Выберите по каждому клиенту два самых дорогих товара, которые он покупал.
 В результатах должно быть ид клиета, его название, ид товара, цена, дата покупки.
