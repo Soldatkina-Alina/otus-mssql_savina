@@ -401,58 +401,38 @@ WHEN NOT MATCHED THEN
 /*
 5. Напишите запрос, который выгрузит данные через bcp out и загрузить через bulk insert
 */
+IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Warehouse.StockItemTransactions_bcp')
+BEGIN
+    SELECT * INTO WideWorldImporters.Warehouse.StockItemTransactions_bcp
+    FROM WideWorldImporters.Warehouse.StockItemTransactions
+    WHERE 1 = 1;
 
-bcp [WideWorldImporters].[Sales].[Customers] out "C:\Path\datafile.csv" -c -t, -T -S localhost
+    ALTER TABLE Warehouse.StockItemTransactions_bcp
+    ADD CONSTRAINT PK_Warehouse_StockItemTransactions_bcp PRIMARY KEY NONCLUSTERED
+    (StockItemTransactionID ASC);
+END;
 
-bcp [WideWorldImporters].[Sales].[Customers] out "C:\Path\datafile2.csv" -N -t, -T -S localhost
-bcp [WideWorldImporters].[Sales].[Customers] out "C:\Path\datafile3.csv" -c -N -t, -T -S localhost
+--В консоль
+bcp WideWorldImporters.Warehouse.StockItemTransactions_bcp out C:\Path\datafile5.csv -c -T
 
-bcp [WideWorldImporters].[Sales].[Customers] out "C:\Path\datafile4.csv" -c -t, -r\n -T -S localhost
+--bcp [WideWorldImporters].[Sales].[Customers] out "C:\Path\datafile.csv" -c -t, -T -S localhost
 
-CREATE TABLE #Temp (
-    CustomerID int NOT NULL,
-    CustomerName nvarchar(100) NOT NULL,
-    BillToCustomerID int NULL,
-    CustomerCategoryID int NOT NULL,
-    BuyingGroupID int NULL,
-    PrimaryContactPersonID int NOT NULL,
-    AlternateContactPersonID int NULL,
-    DeliveryMethodID int NOT NULL,
-    DeliveryCityID int NOT NULL,
-    PostalCityID int NOT NULL,
-    CreditLimit decimal(18,2) NULL,
-    AccountOpenedDate date NOT NULL,
-    StandardDiscountPercentage decimal(18,3) NOT NULL,
-    IsStatementSent bit NOT NULL,
-    IsOnCreditHold bit NOT NULL,
-    PaymentDays int NOT NULL,
-    PhoneNumber nvarchar(20) NOT NULL,
-    FaxNumber nvarchar(20) NOT NULL,
-    DeliveryRun nvarchar(5) NULL,
-    RunPosition nvarchar(5) NULL,
-    WebsiteURL nvarchar(256) NOT NULL,
-    DeliveryAddressLine1 nvarchar(60) NOT NULL,
-    DeliveryAddressLine2 nvarchar(60) NULL,
-    DeliveryPostalCode nvarchar(10) NOT NULL,
-    DeliveryLocation geography NULL,
-    PostalAddressLine1 nvarchar(60) NOT NULL,
-    PostalAddressLine2 nvarchar(60) NULL,
-    PostalPostalCode nvarchar(10) NOT NULL,
-    LastEditedBy int NOT NULL,
-	[ValidFrom] [datetime2](7)  NOT NULL,
-	[ValidTo] [datetime2](7) NOT NULL 
-);
+--Берем чисто схему
+SELECT * INTO WideWorldImporters.Warehouse.StockItemTransactions_Copy
+FROM WideWorldImporters.Warehouse.StockItemTransactions
+WHERE 1 = 2;
 
-drop TABLE #Temp;
+BULK INSERT WideWorldImporters.Warehouse.StockItemTransactions_Copy
+    FROM "C:\Path\datafile5.csv"
+	WITH 
+		(
+		BATCHSIZE = 1000,
+		DATAFILETYPE = 'char',
+		FIELDTERMINATOR = '\t',
+		ROWTERMINATOR ='\n',
+		KEEPNULLS,
+		TABLOCK
+		);
 
-BULK INSERT #Temp
-FROM 'C:\Path\datafile4.csv'
-WITH (
-    FIELDTERMINATOR = ',',
-    ROWTERMINATOR = '\n',
-    FIRSTROW = 1,
-	ERRORFILE = 'C:\Path\error_log.txt',
-    MAXERRORS = 10,
-	CODEPAGE = '650' -- Unicode (UTF-16)
-);
-
+		SELECT * 
+FROM WideWorldImporters.Warehouse.StockItemTransactions_Copy;
