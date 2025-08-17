@@ -1,0 +1,112 @@
+Тема: БД для ведения мероприятий
+Описание: Организация проводит выездные мероприятия, на которые завет различных спикеров или тренеров. Необходима БД, в которой будет вестись учет всех мероприятий, задействованных мастеров, а также участников.
+Возможные отчеты: Отчет о проведенных мерепрриятиях за последнее N месяцев с количеством участников, количеством задействованных мастеров и стоимостью
+Отчет о самых любимых темах. (Какие темы и мастера пользуются наибольшим спросом)
+Отчет о сумме заработка мастеров за N время.
+Полный отчет о количестве задействованных мест, матсеров, учатсников за N врмея.
+
+Таблицы:
+
+1. Справочники
+а) Направления (Directions)
+DirectionId PK INT
+Title NVARCHAR(200)
+Description NVARCHAR(MAX)
+DirectionParentId INT FK >-Directions.DirectionsId
+
+б)Статусы мероприятия StatusEvent
+StatusEventId PK INT
+Name NVARCHAR(200)
+
+в)Статусы расписания StatusShedule
+StatusEventId PK INT
+Name NVARCHAR(200)
+
+г)Статусы заказа StatusOrder
+StatusOrderId PK INT
+Name NVARCHAR(200)
+
+2. Люди
+а)Организаторы (Users)
+UserId (int) PK INT
+FirstName (NVARCHAR(200))
+SecondName (NVARCHAR(200)) 
+Gender
+PhoneNumber int
+Email NVARCHAR(100)
+IsActive (BIT)
+PayPerHour (DECIMAL(18,2)) 
+
+б)Тренера/спискеры (Masters)
+MasterId PK INT
+FirstName (NVARCHAR(200))
+SecondName (NVARCHAR(200)) 
+Gender BIT
+PhoneNumber NVARCHAR(12)
+Email  NVARCHAR(100)
+PayPerHour (DECIMAL(18,2))
+Description
+
+в) Участники (Participants)
+ParticipantId PK INT 
+FirstName (NVARCHAR(200))
+SecondName (NVARCHAR(200)) 
+Gender BIT
+PhoneNumber NVARCHAR(100)
+Email (обязательное поле)
+TelegrammNickname  NVARCHAR(100)
+SpecialNeeds (NVARCHAR(max))
+
+3. Наполнение (Contents)
+а)Мастер классы (Classes)
+ClassId PK INT 
+Title (NVARCHAR(200))
+Description (NVARCHAR(MAX))
+MaxParticipants (INT) 
+MinParticipants (INT) 
+DirectionId INT FK >-Directions.DirectionsId
+
+б)Тренер-треннинг (MastersClasses)
+MastersClassesId PK INT
+ClassId INT FK >-Classes.ClasseId
+MasterId INT FK >-Masters.MasterId
+
+3.Финансы Finance
+а) Заказ (Order)
+OrderId PK INT
+ParticipantId INT
+EventId INT
+FactPrice (DECIMAL(18,2))
+DateOrder DATETIME2
+StatusId INT FK >- StatusOrder.OrderId
+
+4. Основные (Main)
+а) Места (Locations)
+LocationId PK INT 
+LocationName (NVARCHAR(200))
+Address (NVARCHAR(500)) 
+PayPerHour (DECIMAL(18,2)) – стоимость часа
+ContactPerson (NVARCHAR(200)) - контактное лицо
+ContactPhone (NVARCHAR(50)) - контактный телефон
+ContactEmail (NVARCHAR(100)) - контактный email
+Capacity (INT) - вместимость
+Facilities (NVARCHAR(MAX)) - доступные удобства
+
+б) Мероприятия (Events)
+EventId PK INT 
+EventName (NVARCHAR(200)) - название мероприятия
+Description (NVARCHAR(MAX)) - подробное описание
+StartDate (DATETIME2) - дата и время начала
+EndDate (DATETIME2) - дата и время окончания
+LocationId INT FK >-Locations.LocationId
+BasePrice (DECIMAL(18,2)) - базовая стоимость участия
+MaxParticipants (INT) - максимальное количество участников
+StatusEventId INT FK >-StatusEvent.StatusEventId -  статус мероприятия ("Черновик", "Планируется", "Идет регистрация", "Завершено")
+
+в) Расписание (Schedules)
+ScheduleId PK INT
+EventId INT INT FK >-Events.EventId
+ClassId INT INT FK >-Classes.ClassId
+DateTimeStartClass DATETIME2
+DateTimeEndClass DATETIME2
+StatusEventId INT INT FK >-StatusShedule.StatusSheduleId
