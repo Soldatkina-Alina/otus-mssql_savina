@@ -1,0 +1,6 @@
+C:\Users\alink\source\repos\otus-mssql_savina\HM_14_Ex_21\SplitStringLibrary\bin\Debug\SplitStringLibrary.dll
+C:\Users\alink\source\repos\otus-mssql_savina\HM_14_Ex_21\SplitStringLibrary\bin\Debug\SplitStringLibrary.pdb
+C:\Users\alink\source\repos\otus-mssql_savina\HM_14_Ex_21\SplitStringLibrary\obj\Debug\SplitStringLibrary.csproj.AssemblyReference.cache
+C:\Users\alink\source\repos\otus-mssql_savina\HM_14_Ex_21\SplitStringLibrary\obj\Debug\SplitStringLibrary.csproj.CoreCompileInputs.cache
+C:\Users\alink\source\repos\otus-mssql_savina\HM_14_Ex_21\SplitStringLibrary\obj\Debug\SplitStringLibrary.dll
+C:\Users\alink\source\repos\otus-mssql_savina\HM_14_Ex_21\SplitStringLibrary\obj\Debug\SplitStringLibrary.pdb
