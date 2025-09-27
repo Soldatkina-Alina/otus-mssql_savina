@@ -11,8 +11,8 @@
 а) Направления (Directions)
 DirectionId PK INT
 Title NVARCHAR(200) NOT NULL
-Description NVARCHAR(MAX)
-DirectionParentId INT FK >-Directions.DirectionsId
+Description NVARCHAR(MAX) NULL
+DirectionParentId INT FK >-Directions.DirectionsId NULL
 
 б) Тип статуса StatusType
 StatusTypeId PK INT 
@@ -28,41 +28,41 @@ StatusTypeId INT FK >-StatusType NOT NULL
 а)Организаторы (Users)
 UserId (int) PK INT
 FirstName (NVARCHAR(200)) NOT NULL
-SecondName (NVARCHAR(200)) 
-Gender INT
+SecondName (NVARCHAR(200)) NULL
+Gender INT NULL
 PhoneNumber NVARCHAR(20) NOT NULL
 Email NVARCHAR(100) NOT NULL
-IsActive (BIT)
-PayPerHour (DECIMAL(18,2)) 
+IsActive (BIT) NULL
+PayPerHour (DECIMAL(18,2))  NULL
 
 б)Тренера/спикеры (Masters)
 MasterId PK INT
 FirstName (NVARCHAR(200)) NOT NULL
-SecondName (NVARCHAR(200)) 
-Gender INT
-PhoneNumber NVARCHAR(20) NOT NULL
-Email  NVARCHAR(100)
-PayPerHour (DECIMAL(18,2))
-Description
+SecondName (NVARCHAR(200)) NULL
+Gender INT NULL
+PhoneNumber NVARCHAR(20) NULL
+Email  NVARCHAR(100) NULL
+PayPerHour (DECIMAL(18,2)) NULL
+Description NULL
 
 в) Участники (Participants)
 ParticipantId PK INT 
 FirstName (NVARCHAR(200)) NOT NULL
-SecondName (NVARCHAR(200)) 
-Gender INT
-PhoneNumber NVARCHAR(20) NOT NULL
+SecondName (NVARCHAR(200)) NULL
+Gender INT NULL
+PhoneNumber NVARCHAR(20) NULL
 Email NVARCHAR(100) NOT NULL
-TelegrammNickname  NVARCHAR(100)
-SpecialNeeds (NVARCHAR(max))
+TelegrammNickname  NVARCHAR(100) NULL
+SpecialNeeds (NVARCHAR(max)) NULL
 
 3. Наполнение (Contents)
 а)Мастер классы (Classes)
 ClassId PK INT 
-Title (NVARCHAR(200)) NVARCHAR(20)
-Description (NVARCHAR(MAX))
-MaxParticipants (INT) 
-MinParticipants (INT) 
-DirectionId INT FK >-Directions.DirectionsId
+Title (NVARCHAR(200)) NVARCHAR(20) NOT NULL
+Description (NVARCHAR(MAX)) NULL
+MaxParticipants (INT) NULL
+MinParticipants (INT) NULL
+DirectionId INT FK >-Directions.DirectionsId NULL
 
 б)Тренер-треннинг (MastersClasses)
 MastersClassesId PK INT
@@ -81,33 +81,33 @@ StatusId INT FK >- Statuses.StatusesId NOT NULL
 4. Основные (Main)
 а) Места (Locations)
 LocationId PK INT NOT NULL
-LocationName (NVARCHAR(200))
-Address (NVARCHAR(500)) 
-PayPerHour (DECIMAL(18,2)) – стоимость часа
-ContactPerson (NVARCHAR(200)) - контактное лицо
-ContactPhone (NVARCHAR(50)) - контактный телефон
-ContactEmail (NVARCHAR(100)) - контактный email
-Capacity (INT) - вместимость
-Facilities (NVARCHAR(MAX)) - доступные удобства
+LocationName (NVARCHAR(200)) NOT NULL
+Address (NVARCHAR(500)) NULL
+PayPerHour (DECIMAL(18,2)) – стоимость часа NULL
+ContactPerson (NVARCHAR(200)) - контактное лицо NULL
+ContactPhone (NVARCHAR(50)) - контактный телефон NULL
+ContactEmail (NVARCHAR(100)) - контактный email NULL
+Capacity (INT) - вместимость NULL
+Facilities (NVARCHAR(MAX)) - доступные удобства NULL
 
 б) Мероприятия (Events)
 EventId PK INT 
 EventName (NVARCHAR(200)) NOT NULL - название мероприятия
-Description (NVARCHAR(MAX)) - подробное описание
-StartDate (DATETIME2) - дата и время начала
-EndDate (DATETIME2) - дата и время окончания
-LocationId INT FK >-Locations.LocationId
-BasePrice (DECIMAL(18,2)) - базовая стоимость участия
-MaxParticipants (INT) - максимальное количество участников
-StatusId INT FK >-Statuses.StatusesId -  статус мероприятия ("Черновик", "Планируется", "Идет регистрация", "Завершено")
+Description (NVARCHAR(MAX)) NULL - подробное описание
+StartDate (DATETIME2) NULL - дата и время начала
+EndDate (DATETIME2) NULL - дата и время окончания
+LocationId INT FK >-Locations.LocationId NULL
+BasePrice (DECIMAL(18,2)) NULL - базовая стоимость участия
+MaxParticipants (INT) NULL - максимальное количество участников
+StatusId INT FK >-Statuses.StatusesId - NOT NULL статус мероприятия ("Черновик", "Планируется", "Идет регистрация", "Завершено")
 
 в) Расписание (Schedules)
 ScheduleId PK INT
 EventId INT INT FK >-Events.EventId NOT NULL
-ClassId INT INT FK >-Classes.ClassId
-DateTimeStartClass DATETIME2
-DateTimeEndClass DATETIME2
-StatusId INT INT FK >-Statuses.StatusesId
+ClassId INT INT FK >-Classes.ClassId NOT NULL
+DateTimeStartClass DATETIME2 NOT NULL
+DateTimeEndClass DATETIME2 NULL
+StatusId INT INT FK >-Statuses.StatusesId NOT NULL
 
 г)Организаторы-мероприятия (EventOrganizers)
 EventOrganizersId
