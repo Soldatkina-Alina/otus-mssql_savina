@@ -1,5 +1,5 @@
 USE [EventsBD];
--- 1. Справочники
+-- 1. вЂ”РїСЂР°РІРѕС‡РЅРёРєРё
 CREATE TABLE Directions (
     DirectionId INT IDENTITY(1,1) PRIMARY KEY,
     Title NVARCHAR(200) NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE Statuses (
     CONSTRAINT FK_Statuses_StatusTypeId FOREIGN KEY (StatusTypeId) REFERENCES StatusType(StatusTypeId)
 );
 
--- 2. Люди
+-- 2. Р‹СЋРґРё
 CREATE TABLE Users (
     UserId INT IDENTITY(1,1) PRIMARY KEY,
     FirstName NVARCHAR(200) NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE Masters (
 
 CREATE TABLE Participants (
     ParticipantId INT IDENTITY(1,1) PRIMARY KEY,
-    FirstName NVARCHAR(200) NOT NULL,
+    FirstName NVARCHAR(200) NULL,
     SecondName NVARCHAR(200) NULL,
     Gender INT NULL,
     PhoneNumber NVARCHAR(20) NULL,
@@ -62,7 +62,7 @@ CREATE TABLE Participants (
     CONSTRAINT CHK_Participants_Email CHECK (Email LIKE '%_@__%.__%')
 );
 
--- 3. Наполнение (Contents)
+-- 3. РЊР°РїРѕР»РЅРµРЅРёРµ (Contents)
 CREATE TABLE Classes (
     ClassId INT IDENTITY(1,1) PRIMARY KEY,
     Title NVARCHAR(200) NOT NULL,
@@ -85,7 +85,7 @@ CREATE TABLE MastersClasses (
     CONSTRAINT UQ_MastersClasses_ClassId_MasterId UNIQUE (ClassId, MasterId)
 );
 
--- 4. Основные (Main) - создаем сначала Locations и Events, так как на них есть ссылки
+-- 4. СњСЃРЅРѕРІРЅС‹Рµ (Main) - СЃРѕР·РґР°РµРј СЃРЅР°С‡Р°Р»Р° Locations Рё Events, С‚Р°Рє РєР°Рє РЅР° РЅРёС… РµСЃС‚СЊ СЃСЃС‹Р»РєРё
 CREATE TABLE Locations (
     LocationId INT IDENTITY(1,1) PRIMARY KEY,
     LocationName NVARCHAR(200) NOT NULL,
@@ -139,7 +139,7 @@ CREATE TABLE EventOrganizers (
     CONSTRAINT UQ_EventOrganizers_EventId_UserId UNIQUE (EventId, UserId)
 );
 
--- 5.Финансы Finance (создаем после Events)
+-- 5.вЂРёРЅР°РЅСЃС‹ Finance (СЃРѕР·РґР°РµРј РїРѕСЃР»Рµ Events)
 CREATE TABLE [Order] (
     OrderId INT IDENTITY(1,1) PRIMARY KEY,
     ParticipantId INT NOT NULL,
@@ -154,7 +154,7 @@ CREATE TABLE [Order] (
 );
 
 
--- Индексы для внешних ключей
+-- В»РЅРґРµРєСЃС‹ РґР»В¤ РІРЅРµС€РЅРёС… РєР»СЋС‡РµР№
 CREATE INDEX FK_Directions_DirectionParentId ON Directions(DirectionParentId);
 CREATE INDEX FK_Statuses_StatusTypeId ON Statuses(StatusTypeId);
 CREATE INDEX FK_Classes_DirectionId ON Classes(DirectionId);
@@ -169,5 +169,5 @@ CREATE INDEX FK_Schedules_EventId ON Schedules(EventId);
 CREATE INDEX FK_Schedules_ClassId ON Schedules(ClassId);
 CREATE INDEX FK_Schedules_StatusId ON Schedules(StatusId);
 
---Лучше сделать составным, так как будут использоваться всегда в связке
+--Р‹СѓС‡С€Рµ СЃРґРµР»Р°С‚СЊ СЃРѕСЃС‚Р°РІРЅС‹Рј, С‚Р°Рє РєР°Рє Р±СѓРґСѓС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃВ¤ РІСЃРµРіРґР° РІ СЃРІВ¤Р·РєРµ
 CREATE INDEX FK_EventOrganizers_EventId ON EventOrganizers(EventId, UserId);
