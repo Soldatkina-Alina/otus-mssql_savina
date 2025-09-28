@@ -18,7 +18,7 @@ DirectionParentId INT FK >-Directions.DirectionsId NULL
 StatusTypeId PK INT 
 Name NVARCHAR(100) NOT NULL
 
-б)Statuses
+в)Statuses
 StatusPK INT
 Name NVARCHAR(200) NOT NULL
 StatusTypeId INT FK >-StatusType NOT NULL
