@@ -21,9 +21,7 @@ AS
 GO
 
 
---создаем таблицу для секционированния 
---SELECT * INTO Sales.OrdersPartitioned
---FROM Sales.Invoices;
+
 
 USE [WideWorldImporters]
 --создадим новую секционированную таблицу
